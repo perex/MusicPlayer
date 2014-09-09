@@ -1,0 +1,76 @@
+inherited FMXMusicPlayerFrm_LgXhdpiPh: TFMXMusicPlayerFrm_LgXhdpiPh
+  ClientHeight = 695
+  ClientWidth = 450
+  DesignerMasterStyle = 3
+  inherited tcUITabs: TTabControl
+    Size.Width = 450.000000000000000000
+    Size.Height = 695.000000000000000000
+    inherited tiAlbums: TTabItem
+      Size.Width = 150.000000000000000000
+      inherited lvAlbums: TListView
+        Size.Width = 450.000000000000000000
+        Size.Height = 646.000000000000000000
+      end
+    end
+    inherited tiSongs: TTabItem
+      Size.Width = 150.000000000000000000
+      inherited lvSongs: TListView
+        Size.Width = 450.000000000000000000
+        Size.Height = 646.000000000000000000
+      end
+    end
+    inherited tiNowPlaying: TTabItem
+      Size.Width = 150.000000000000000000
+      inherited tbNowPlaying: TToolBar
+        Position.Y = 598.000000000000000000
+        Size.Width = 450.000000000000000000
+        inherited btnNext: TButton
+          Position.X = 402.000000000000000000
+        end
+        inherited lyState: TLayout
+          inherited btnPlay: TButton
+            Size.Height = 50.000000000000000000
+          end
+          inherited btnStop: TButton
+            Size.Height = 50.000000000000000000
+          end
+        end
+      end
+      inherited lblArtistVal: TLabel
+        Size.Width = 330.000000000000000000
+      end
+      inherited lblTitleVal: TLabel
+        Size.Width = 330.000000000000000000
+      end
+      inherited lblAlbumVal: TLabel
+        Size.Width = 330.000000000000000000
+      end
+      inherited lblDurationVal: TLabel
+        Size.Width = 330.000000000000000000
+      end
+      inherited lyProgressSettings: TLayout
+        Position.Y = 498.000000000000000000
+        Size.Width = 450.000000000000000000
+        inherited tbProgress: TTrackBar
+          Size.Width = 430.000000000000000000
+        end
+      end
+    end
+  end
+  inherited mvSettings: TMultiView
+    Size.Height = 695.000000000000000000
+    inherited SettingsList: TListBox
+      Size.Height = 647.000000000000000000
+      inherited CrossfadeMode: TListBoxItem [7]
+      end
+      inherited VolumeHeader: TListBoxGroupHeader [8]
+      end
+      inherited VolumeListItem: TListBoxItem [9]
+      end
+      inherited CrossFadeMusic: TListBoxGroupHeader [10]
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+end
