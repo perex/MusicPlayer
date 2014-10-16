@@ -4,6 +4,7 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
   Caption = 'FMXMusicPlayer'
   ClientHeight = 567
   ClientWidth = 384
+  Position = Designed
   FormFactor.Width = 1920
   FormFactor.Height = 1080
   FormFactor.Devices = [Desktop]
@@ -16,14 +17,14 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
     Size.Height = 567.000000000000000000
     Size.PlatformDefault = False
     TabHeight = 49.000000000000000000
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     TabPosition = Bottom
     object tiAlbums: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 128.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -73,7 +74,7 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 128.000000000000000000
       Size.Height = 49.000000000000000000
       Size.PlatformDefault = False
@@ -117,9 +118,8 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
           object btnPlay: TButton
             Align = Left
             Enabled = False
-            Position.Y = 1.000000000000000000
             Size.Width = 48.000000000000000000
-            Size.Height = 48.000000000000000000
+            Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'playtoolbutton'
             TabOrder = 0
@@ -141,9 +141,8 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
             Align = Right
             Enabled = False
             Position.X = 105.000000000000000000
-            Position.Y = 1.000000000000000000
             Size.Width = 48.000000000000000000
-            Size.Height = 48.000000000000000000
+            Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'stoptoolbutton'
             TabOrder = 2
@@ -283,6 +282,8 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
       DefaultItemStyles.GroupHeaderStyle = ''
       DefaultItemStyles.GroupFooterStyle = ''
       GroupingKind = Grouped
+      Viewport.Width = 319.000000000000000000
+      Viewport.Height = 519.000000000000000000
       object RepeatModes: TListBoxGroupHeader
         Size.Width = 19.000000000000000000
         Size.Height = 30.000000000000000000
@@ -339,6 +340,7 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
       end
       object ShufffleMode: TListBoxItem
         Selectable = False
+        IsChecked = True
         Position.Y = 236.000000000000000000
         Size.Width = 19.000000000000000000
         Size.Height = 44.000000000000000000
@@ -347,7 +349,7 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
         Text = 'Enable Shuffle Mode'
         object swShuffleMode: TSwitch
           Align = Right
-          IsChecked = False
+          IsChecked = True
           Margins.Top = 5.000000000000000000
           Margins.Right = 10.000000000000000000
           Margins.Bottom = 5.000000000000000000
@@ -365,6 +367,9 @@ object FMXMusicPlayerFrm: TFMXMusicPlayerFrm
         end
       end
       object CrossFadeMusic: TListBoxGroupHeader
+        Size.Width = 44.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
         TabOrder = 10
         Text = 'Cross Fase Music'
       end

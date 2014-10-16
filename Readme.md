@@ -1,8 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html>
   <head>
-	<title>iOSMediaPlayer&nbsp;Demo</title>
+	<title>iOS And Android MediaPlayer&nbsp;Demo</title>
   </head>
 
   <body>

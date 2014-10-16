@@ -27,14 +27,6 @@ inherited FMXMusicPlayerFrm_SmXhdpiPh: TFMXMusicPlayerFrm_SmXhdpiPh
         inherited btnNext: TButton
           Position.X = 202.000000000000000000
         end
-        inherited lyState: TLayout
-          inherited btnPlay: TButton
-            Size.Height = 50.000000000000000000
-          end
-          inherited btnStop: TButton
-            Size.Height = 50.000000000000000000
-          end
-        end
       end
       inherited lblArtistVal: TLabel
         Size.Width = 130.000000000000000000
@@ -61,16 +53,8 @@ inherited FMXMusicPlayerFrm_SmXhdpiPh: TFMXMusicPlayerFrm_SmXhdpiPh
     Size.Height = 375.000000000000000000
     inherited SettingsList: TListBox
       Size.Height = 327.000000000000000000
-      inherited CrossfadeMode: TListBoxItem [7]
-      end
-      inherited VolumeHeader: TListBoxGroupHeader [8]
-      end
-      inherited VolumeListItem: TListBoxItem [9]
-      end
-      inherited CrossFadeMusic: TListBoxGroupHeader [10]
-        Size.Height = 30.000000000000000000
-        Size.PlatformDefault = False
-      end
+      Viewport.Width = 319.000000000000000000
+      Viewport.Height = 519.000000000000000000
     end
   end
 end

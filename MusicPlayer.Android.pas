@@ -16,7 +16,7 @@ interface
 uses
   FMX.Graphics,
   MusicPlayer.Utils,
-  System.IoUtils, System.SysUtils, System.Classes,
+  System.IoUtils, System.SysUtils, System.Classes, System.Generics.Collections,
   FMX.Types, FMX.Platform.Android,
   Androidapi.JNI.Os, Androidapi.JNI.Net,
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText,
@@ -40,11 +40,13 @@ type
   private
     FCurrentIndex: Cardinal;
     FPlaylist: TArray<TMPSong>;
+    FSongListReproduced: TList<Cardinal>;
     FAlbums: TArray<TMPAlbum>;
     FMusicPlayer: JMediaPlayer;
     FPlayBackState: TMPPlaybackState;
     FRepeatMode: TMPRepeatMode;
     FShuffleMode: Boolean;
+    FCrossFadeMode: Boolean;
     FDefaultAlbumImage: TBitmap;
     FOnSongChange: TOnSongChangeEvent;
     FOnProcessPlay: TOnProcessPlayEvent;
@@ -55,12 +57,14 @@ type
     procedure SetTime(const Value: Single);
     procedure SetRepeatMode(const Value: TMPRepeatMode);
     procedure SetShuffleMode(const Value: Boolean);
+    procedure SetCrossFadeMode(const Value: Boolean);
     function GetVolume: Single;
     function GetTime: Single;
     function GetRepeatMode: TMPRepeatMode;
     function GetDuration: Single;
     function GetPlaybackState: TMPPlaybackState;
     function GetShuffleMode: Boolean;
+    function GetCrossFadeMode: Boolean;
   public
     destructor Destroy; override;
     class procedure SetPlayerType(AType: TMPControllerType);
@@ -71,6 +75,7 @@ type
     property Duration: Single read GetDuration;
     property PlaybackState: TMPPlaybackState read GetPlaybackState;
     property ShuffleMode: Boolean read GetShuffleMode write SetShuffleMode;
+    property CrossFadeMode: Boolean read GetCrossFadeMode write SetCrossFadeMode;
     property RepeatMode: TMPRepeatMode read GetRepeatMode write SetRepeatMode;
     property Playlist: TArray<TMPSong> read FPlaylist;
     property Albums: TArray<TMPAlbum> read FAlbums;
@@ -101,7 +106,8 @@ begin
   FMusicPlayer := TJMediaPlayer.Create;
   FPlayBackState := TMPPlaybackState.Stopped;
   FRepeatMode := TMPRepeatMode.All;
-  FShuffleMode := False;
+  FShuffleMode := True;
+  FCrossFadeMode := True;
   FDefaultAlbumImage := TBitmap.CreateFromFile(TPath.Combine(TPath.GetDocumentsPath,'MusicNote.png'));
   TProcessThread.Create(True,self,DoOnProcessPlay).Start;
 end;
@@ -142,6 +148,9 @@ var
   cursor: JCursor;
   art_uri,
   uri: Jnet_Uri;
+  AlbumsList: TList<String>;
+  AlbumsCont, index: Integer;
+  AlbumName: String;
 begin
   projection := TJavaObjectArray<JString>.Create(3);
   projection.Items[0] := TJAudio_AlbumColumns.JavaClass.ALBUM;
@@ -149,6 +158,7 @@ begin
   projection.Items[2] := StringToJString('_id');
 
   art_uri := TJnet_Uri.JavaClass.parse(StringToJString('content://media/external/audio/albumart'));
+
   cursor := MainActivity.getContentResolver.query(
     TJAudio_Albums.JavaClass.EXTERNAL_CONTENT_URI,
     projection,
@@ -156,25 +166,43 @@ begin
     nil,
     nil);
 
-  SetLength(Result, cursor.getCount);
-  SetLength(FAlbums, cursor.getCount + 1);
-  FAlbums[cursor.getCount] := TMPAlbum.AllMusicAlbum;
+  AlbumsList := TList<String>.Create;
+
+  AlbumsCont := 0;
+
   while (cursor.moveToNext) do
   begin
-    FAlbums[cursor.getPosition].Name := JStringToString(cursor.getString(0));
-    FAlbums[cursor.getPosition].Artist := JStringToString(cursor.getString(1));
-    FAlbums[cursor.getPosition].Album_ID := cursor.getInt(2);
+    AlbumName := JStringToString(cursor.getString(0));
 
-    uri := TJContentUris.JavaClass.withAppendedId(art_uri, FAlbums[cursor.getPosition].Album_ID);
+    if AlbumsList.IndexOf(AlbumName) = -1 then
+    begin
+      Inc(AlbumsCont);
 
-    if TFile.Exists(JStringToString(uri.getPath)) then
-      FAlbums[cursor.getPosition].Artwork := TBitmap.CreateFromFile(JStringToString(uri.getPath))
-    else
-      FAlbums[cursor.getPosition].Artwork := FDefaultAlbumImage;
+      SetLength(Result, AlbumsCont);
+      SetLength(FAlbums, AlbumsCont);
+      index := AlbumsCont - 1;
 
-    Result[cursor.getPosition] := FAlbums[cursor.getPosition].Name;
+      AlbumsList.Add(AlbumName);
+      FAlbums[index].Name := AlbumName;
+      FAlbums[index].Artist := JStringToString(cursor.getString(1));
+      FAlbums[index].Album_ID := cursor.getInt(2);
+
+      uri := TJContentUris.JavaClass.withAppendedId(art_uri, FAlbums[index].Album_ID);
+
+      if TFile.Exists(JStringToString(uri.getPath)) then
+        FAlbums[index].Artwork := TBitmap.CreateFromFile(JStringToString(uri.getPath))
+      else
+        FAlbums[index].Artwork := FDefaultAlbumImage;
+
+      Result[index] := FAlbums[index].Name;
+    end;
   end;
+  Inc(AlbumsCont);
+  SetLength(FAlbums, AlbumsCont);
+  FAlbums[AlbumsCont-1] := TMPAlbum.AllMusicAlbum;
+
   cursor.close;
+  AlbumsList.Clear;
 end;
 
 function TMusicPlayer.GetDuration: Single;
@@ -196,6 +224,12 @@ function TMusicPlayer.GetShuffleMode: Boolean;
 begin
   Result := FShuffleMode;
 end;
+
+function TMusicPlayer.GetCrossFadeMode: Boolean;
+begin
+  Result := FCrossFadeMode;
+end;
+
 
 function TMusicPlayer.GetSongs: TArray<string>;
 var
@@ -222,6 +256,7 @@ begin
 
   SetLength(Result,cursor.getCount);
   SetLength(FPlaylist, cursor.getCount);
+  FSongListReproduced := TList<Cardinal>.Create;
   while (cursor.moveToNext) do
   begin
     FPlaylist[cursor.getPosition] := TMPSong.FromCursor(cursor);
@@ -282,6 +317,8 @@ begin
 end;
 
 procedure TMusicPlayer.Next;
+var
+  nextSong: Cardinal;
 begin
   case RepeatMode of
     TMPRepeatMode.One:
@@ -306,7 +343,13 @@ begin
       else
       begin
         if FShuffleMode then
-          PlayByIndex(Random(Length(FPlaylist)))
+        begin
+          nextSong := Random(Length(FPlaylist));
+          FSongListReproduced.Add(nextSong);
+          PlayByIndex(nextSong);
+          if FSongListReproduced.Count = Length(FPlaylist) then
+            FSongListReproduced.Clear;
+        end
         else
           PlayByIndex(FCurrentIndex + 1);
       end;
@@ -369,6 +412,11 @@ end;
 procedure TMusicPlayer.SetShuffleMode(const Value: Boolean);
 begin
   FShuffleMode := Value;
+end;
+
+procedure TMusicPlayer.SetCrossFadeMode(const Value: Boolean);
+begin
+  FCrossFadeMode := Value;
 end;
 
 procedure TMusicPlayer.SetTime(const Value: Single);
